@@ -1,0 +1,19 @@
+.conventer_general{
+    display: flex;
+    justify-content: space-between;
+    max-width: 60%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.conventer_input{
+    padding: 10px;
+}
+.conventer_select{
+    padding: 10px;
+}
+.conventer_select option{
+    font-size: 14px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 0px;
+}

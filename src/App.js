@@ -35,7 +35,7 @@ function App() {
     <CurrencyContext.Provider value={currencies}>
       <div className="App">
         <Header />
-        App
+        <h2 className="body_title">Конвертатор коштів</h2>
         <Conventer />
       </div>
     </CurrencyContext.Provider>

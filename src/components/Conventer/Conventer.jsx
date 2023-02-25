@@ -1,5 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { CurrencyContext } from "../../App";
+import s from "./Conventer.module.css";
 
 const Conventer = () => {
   const currencies = useContext(CurrencyContext);
@@ -19,64 +20,111 @@ const Conventer = () => {
       });
     }
   }, [currencies]);
-  console.log(form);
+  const getConvertedValue = useCallback(
+    (value, currencyFrom, currencyTo) => {
+      const firstRate = currencies.find(
+        (currency) => currency.cc === currencyFrom
+      ).rate;
+      const secondRate = currencies.find(
+        (currency) => currency.cc === currencyTo
+      ).rate;
+      const UAH = value * firstRate;
+      return UAH / secondRate;
+    },
+    [currencies]
+  );
+
+  const getRoundToTwoDecimalNumbers = useCallback((number) => {
+    return Math.round(number * 100) / 100;
+  }, []);
+
   return (
-    <div>
+    <div className={s.conventer_general}>
       <div>
-        <div>
-          <select
-            value={form.firstSelect}
-            onChange={(e) => {
-              setForm({ ...form, firstSelect: e.target.value });
-            }}
-          >
-            {!!currencies.length &&
-              currencies.map((item) => (
-                <option key={item.r030} value={item.cc}>
-                  {item.txt}
-                </option>
-              ))}
-          </select>
-          <input
-            placeholder="count"
-            value={form.firstInput}
-            onChange={(e) => {
-              const value = e.target.value;
-              const firstRate = currencies.find(
-                (currency) => currency.cc === form.firstSelect
-              ).rate;
-              const secondRate = currencies.find(
-                (currency) => currency.cc === form.secondSelect
-              ).rate;
-              console.log(firstRate, secondRate);
-              const UAH = value * firstRate;
-              console.log(UAH);
-              setForm({ ...form, firstInput: value, secondInput: UAH / secondRate });
-            }}
-          />
-        </div>
-        <div>
-          <select
-            value={form.secondSelect}
-            onChange={(e) => {
-              setForm({ ...form, secondSelect: e.target.value });
-            }}
-          >
-            {!!currencies.length &&
-              currencies.map((item) => (
-                <option key={item.r030} value={item.cc}>
-                  {item.txt}
-                </option>
-              ))}
-          </select>
-          <input
-            placeholder="count"
-            value={form.secondInput}
-            onChange={(e) => {
-              setForm({ ...form, secondInput: e.target.value });
-            }}
-          />
-        </div>
+        <select
+          className={s.conventer_select}
+          value={form.firstSelect}
+          onChange={(e) => {
+            const currencyCode = e.target.value;
+            setForm({
+              ...form,
+              firstSelect: currencyCode,
+              firstInput: getRoundToTwoDecimalNumbers(
+                getConvertedValue(
+                  form.secondInput,
+                  form.secondSelect,
+                  currencyCode
+                )
+              ),
+            });
+          }}
+        >
+          {!!currencies.length &&
+            currencies.map((item) => (
+              <option key={item.r030} value={item.cc}>
+                {item.txt}
+              </option>
+            ))}
+        </select>
+        <input
+          type="number"
+          placeholder="count"
+          className={s.conventer_input}
+          value={form.firstInput}
+          onChange={(e) => {
+            const value = e.target.value;
+            setForm({
+              ...form,
+              firstInput: value,
+              secondInput: getRoundToTwoDecimalNumbers(
+                getConvertedValue(value, form.firstSelect, form.secondSelect)
+              ),
+            });
+          }}
+        />
+      </div>
+      <div>
+        <select
+          className={s.conventer_select}
+          value={form.secondSelect}
+          onChange={(e) => {
+            const currencyCode = e.target.value;
+            setForm({
+              ...form,
+              secondSelect: currencyCode,
+              secondInput: getRoundToTwoDecimalNumbers(
+                getConvertedValue(
+                  form.firstInput,
+                  form.firstSelect,
+                  currencyCode
+                )
+              ),
+            });
+          }}
+        >
+          {!!currencies.length &&
+            currencies.map((item) => (
+              <option key={item.r030} value={item.cc}>
+                {item.txt}
+              </option>
+            ))}
+        </select>
+        <input
+          type="number"
+          className={s.conventer_input}
+          placeholder="count"
+          value={form.secondInput}
+          onChange={(e) => {
+            const value = e.target.value;
+            setForm({
+              ...form,
+              secondInput: value,
+              firstInput: getRoundToTwoDecimalNumbers(
+                getConvertedValue(value, form.secondSelect, form.firstSelect)
+              ),
+            });
+          }}
+        />
       </div>
     </div>
   );
